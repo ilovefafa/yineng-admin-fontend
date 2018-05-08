@@ -21,10 +21,6 @@
           Sign in
         </el-button>
       </el-form-item>
-      <div class="tips">
-        <span style="margin-right:20px;">username: admin</span>
-        <span> password: admin</span>
-      </div>
     </el-form>
   </div>
 </template>
@@ -91,8 +87,8 @@ export default {
 </script>
 
 <style rel="stylesheet/scss" lang="scss">
-$bg:#2d3a4b;
-$light_gray:#eee;
+$bg: #2d3a4b;
+$light_gray: #eee;
 
 /* reset element-ui css */
 .login-container {
@@ -121,13 +117,12 @@ $light_gray:#eee;
     color: #454545;
   }
 }
-
 </style>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
-$bg:#2d3a4b;
-$dark_gray:#889aa4;
-$light_gray:#eee;
+$bg: #2d3a4b;
+$dark_gray: #889aa4;
+$light_gray: #eee;
 .login-container {
   position: fixed;
   height: 100%;
