@@ -4,7 +4,8 @@
     <breadcrumb></breadcrumb>
     <el-dropdown class="avatar-container" trigger="click">
       <div class="avatar-wrapper">
-        <img class="user-avatar" :src="avatar+'?imageView2/1/w/80/h/80'">
+        <!-- <img class="user-avatar" :src="avatar+'?imageView2/1/w/80/h/80'" alt="no avatar"> -->
+        <img class="user-avatar" :src="require('@/assets/404_images/404.png')" alt="no avatar">
         <i class="el-icon-caret-bottom"></i>
       </div>
       <el-dropdown-menu class="user-dropdown" slot="dropdown">
@@ -55,6 +56,7 @@ export default {
   height: 50px;
   line-height: 50px;
   border-radius: 0px !important;
+  position: static;
   .hamburger-container {
     line-height: 58px;
     height: 50px;

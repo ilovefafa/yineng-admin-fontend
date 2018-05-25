@@ -27,3 +27,22 @@
     }
   }
 }
+
+//table
+.el-table {
+  .warning-row {
+    background: oldlace;
+  }
+  .danger-row {
+    background: rgb(255, 218, 218)
+  }
+}
+
+.cancelButtonClass {
+  float: right;
+  margin-left: 10px;
+}
+
+.el-alert{
+  margin-bottom: 10px;
+}

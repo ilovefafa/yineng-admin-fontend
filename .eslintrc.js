@@ -1,18 +1,21 @@
 module.exports = {
   root: true,
-  parser: 'babel-eslint',
+
   parserOptions: {
-    sourceType: 'module'
+    sourceType: 'module',
+    parser: 'babel-eslint',
   },
   env: {
     browser: true,
     node: true,
     es6: true,
   },
-  extends: 'eslint:recommended',
+  extends: ['plugin:vue/essential'],
+  // 'eslint:recommended',
   // required to lint *.vue files
   plugins: [
-    'html'
+    // 'html',
+    'vue'
   ],
   // check if imports actually resolve
   'settings': {
@@ -25,6 +28,14 @@ module.exports = {
   // add your custom rules here
   //it is base on https://github.com/vuejs/eslint-config-vue
   rules: {
+    "vue/html-indent": [
+      "error",
+      2
+    ],
+    "comma-dangle": [
+      "error",
+      "always"
+    ],
     'accessor-pairs': 2,
     'arrow-spacing': [2, {
       'before': true,
