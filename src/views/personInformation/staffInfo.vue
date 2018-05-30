@@ -1,15 +1,14 @@
 <template>
   <div class="main">
-    <div v-if="navBarFixed" style="height:61px"></div>
     <ceiling-operator>
-      <el-button type="primary" @click="dialogFormVisible=true,toggleButton=true">新建客户</el-button>
+      <el-button type="primary" @click="openForm">新建职员</el-button>
       <!-- <el-button type="primary" @click="queryClient">查询职员</el-button> -->
       <!-- <el-input v-model="queryClientData" clearable placeholder="请输入职员名称" style="width:200px;" ></el-input> -->
     </ceiling-operator>
     <el-table
       style="width: 100%"
       height="475"
-      :data="clientTable"
+      :data="staffTable"
     >
       <el-table-column
         prop="date"
@@ -18,12 +17,12 @@
       </el-table-column>
       <el-table-column
         prop="name"
-        label="客户全称"
+        label="职员全称"
       >
       </el-table-column>
       <el-table-column
-        prop="linkMan"
-        label="联系人"
+        prop="jobTitle"
+        label="职位"
       >
       </el-table-column>
       <el-table-column
@@ -53,18 +52,21 @@
       :visible.sync="dialogFormVisible"
       :before-close="handleClose"
     >
-      <el-form :model="clientForm">
-        <el-form-item label="客户全称" :label-width="'80px'">
-          <el-input v-model="clientForm.name" ></el-input>
+      <el-form :model="staffForm" ref="form">
+        <el-form-item label="职员全称" :label-width="'80px'">
+          <el-input v-model="staffForm.name" ></el-input>
         </el-form-item>
-        <el-form-item label="联系人" :label-width="'80px'">
-          <el-input v-model="clientForm.linkMan" ></el-input>
+        <el-form-item label="活动区域" :label-width="'80px'">
+          <el-select v-model="staffForm.jobTitle" placeholder="请选择职位">
+            <el-option label="电气工程师" value="电气工程师"></el-option>
+            <el-option label="业务员" value="业务员"></el-option>
+          </el-select>
         </el-form-item>
-        <el-form-item label="联系号码" :label-width="'80px'">
-          <el-input v-model="clientForm.phoneNumber" ></el-input>
+        <el-form-item label="联系方式" :label-width="'80px'">
+          <el-input v-model="staffForm.phoneNumber" ></el-input>
         </el-form-item>
         <el-form-item label="备注" :label-width="'80px'">
-          <el-input v-model="clientForm.remarks" ></el-input>
+          <el-input v-model="staffForm.remarks" ></el-input>
         </el-form-item>
 
       </el-form>
@@ -79,7 +81,6 @@
 
 <script>
 import ceilingOperator from '@/components/ceilingOperator'
-
 export default {
   components: {
     ceilingOperator
@@ -87,12 +88,12 @@ export default {
   data() {
     return {
       queryClientData: '',
-      clientTable: [],
-      clientForm: {
+      staffTable: [],
+      staffForm: {
         name: '',
         phoneNumber: '',
-        linkMan: '',
-        remarks: ''
+        remarks: '',
+        jobTitle: ''
       },
       navBarFixed: false,
       dialogFormVisible: false,
@@ -103,20 +104,24 @@ export default {
     this.getClient()
   },
   methods: {
+    openForm() {
+      this.dialogFormVisible = true
+      this.toggleButton = true
+    },
     async getClient() {
       const res = await this.$request({
-        url: 'client/get',
+        url: 'staff/get',
         method: 'get'
       })
-      this.clientTable = res.data.client
+      this.staffTable = res.data.staff
     },
     async updateClient() {
       try {
         await this.$request(
-          { url: 'client/update',
+          { url: 'staff/update',
             method: 'post',
             data: {
-              form: this.clientForm
+              form: this.staffForm
             }
           })
         this.$message({
@@ -138,11 +143,11 @@ export default {
     async handleEdit(index, row) {
       this.toggleButton = false
       this.dialogFormVisible = true
-      this.clientForm.id = row._id
-      this.clientForm.name = row.name
-      this.clientForm.linkMan = row.linkMan
-      this.clientForm.phoneNumber = row.phoneNumber
-      this.clientForm.remarks = row.remarks
+      this.staffForm.id = row._id
+      this.staffForm.name = row.name
+      this.staffForm.phoneNumber = row.phoneNumber
+      this.staffForm.remarks = row.remarks
+      this.staffForm.jobTitle = row.jobTitle
     },
     async handleDelete(index, row) {
       try {
@@ -154,7 +159,7 @@ export default {
           lockScroll: false
         })
         await this.$request({
-          url: 'client/delete',
+          url: 'staff/delete',
           method: 'post',
           data: {
             id: row._id
@@ -179,13 +184,13 @@ export default {
     },
     async createClient() {
       await this.$request({
-        url: 'client/create',
+        url: 'staff/create',
         method: 'post',
         data: {
-          form: this.clientForm
+          form: this.staffForm
         }
       })
-      this.clientForm = {}
+      this.staffForm = {}
       this.dialogFormVisible = false
       this.createButton = false
       this.$message({
@@ -194,6 +199,7 @@ export default {
       })
       this.getClient()
     }
+
   }
 }
 </script>

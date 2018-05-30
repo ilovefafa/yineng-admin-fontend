@@ -46,3 +46,23 @@
 .el-alert{
   margin-bottom: 10px;
 }
+
+.el-tag{
+  background-color: rgb(214, 234, 255)
+}
+
+.el-tag--info{
+  background-color:#fafafa
+}
+
+.el-tag--success{
+  background-color:#e8ffdd
+}
+
+.el-tag--warning{
+  background-color:rgb(255, 242, 223)
+}
+
+.el-button+.el-button{
+  margin-left: 0px;
+}

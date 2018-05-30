@@ -11,16 +11,14 @@ export default [
       {
         path: 'ClientInfo',
         name: 'ClientInfo',
-        component: () => import('@/views/personInfomation/clientInfo.vue'),
-        meta: { title: '客户信息', icon: 'table' },
-        hidden: true
+        component: () => import('@/views/personInformation/clientInfo'),
+        meta: { title: '客户信息', icon: 'table' }
       },
       {
-        path: 'SalesmanInfo',
-        name: 'SalesmanInfo',
-        component: () => import('@/views/personInfomation/salesmanInfo.vue'),
-        meta: { title: '业务员信息', icon: 'table' },
-        hidden: true
+        path: 'staffInfo',
+        name: 'staffInfo',
+        component: () => import('@/views/personInformation/staffInfo'),
+        meta: { title: '员工信息', icon: 'table' }
       }
     ]
   }
