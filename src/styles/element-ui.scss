@@ -63,6 +63,15 @@
   background-color:rgb(255, 242, 223)
 }
 
+.el-tag--danger{
+  background-color:rgb(253, 229, 229)
+}
+
+
 .el-button+.el-button{
   margin-left: 0px;
+}
+
+.el-dialog__body {
+  padding: 20px 20px 0px 20px;
 }

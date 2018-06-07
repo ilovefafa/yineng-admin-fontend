@@ -38,8 +38,7 @@ export const constantRouterMap = [
       component: () => import('@/views/dashboard/index')
     }]
   },
-  ...item,
-  ...personInfo
+  ...item
 ]
 
 export default new Router({
@@ -47,4 +46,8 @@ export default new Router({
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRouterMap
 })
+
+export const asyncRouterMap = [
+  ...personInfo
+]
 

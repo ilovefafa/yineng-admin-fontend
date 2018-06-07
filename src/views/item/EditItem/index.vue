@@ -21,13 +21,28 @@
           <el-input v-model="item.name" ></el-input>
         </el-form-item>
         <el-form-item label="客户名称" prop="client" >
-          <el-input v-model="item.client"></el-input>
+          <el-autocomplete
+            v-model="item.client"
+            :fetch-suggestions="queryAsync('client')"
+            placeholder="请输入内容"
+            value-key="name"
+          ></el-autocomplete>
         </el-form-item>
         <el-form-item label="业务员" prop="salesman" >
-          <el-input v-model="item.salesman"></el-input>
+          <el-autocomplete
+            v-model="item.salesman"
+            :fetch-suggestions="queryAsync('staff','salesman')"
+            placeholder="请输入内容"
+            value-key="name"
+          ></el-autocomplete>
         </el-form-item>
         <el-form-item label="技术负责人" prop="technicalDirector" >
-          <el-input v-model="item.technicalDirector" placeholder="如非本公司报价，直接填写报价公司名称，如：吉控"></el-input>
+          <el-autocomplete
+            v-model="item.technicalDirector"
+            :fetch-suggestions="queryAsync('staff','technicalDirector')"
+            placeholder="请输入内容"
+            value-key="name"
+          ></el-autocomplete>
         </el-form-item>
         <el-form-item label="品牌指定">
           <el-input v-model="item.brand"></el-input>
@@ -48,10 +63,11 @@
             <el-option label="报价完成" value="报价完成"></el-option>
             <el-option label="生产中" value="生产中"></el-option>
             <el-option label="失效" value="失效"></el-option>
+            <el-option label="项目完成" value="项目完成"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="失效原因"  v-if="item.status==='失效'" prop="failureReason" :rules=" { required: true, message: '请输选择', trigger: 'change' }">
-          <el-select v-model="item.failureReason" placeholder="请选择项目进度" >
+          <el-select v-model="item.failureReason" placeholder="请选择失效原因" >
             <el-option label="报价过高" value="报价过高"></el-option>
             <el-option label="超出报价期限" value="超出报价期限"></el-option>
             <el-option label="资质不符合要求" value="资质不符合要求"></el-option>
@@ -102,7 +118,34 @@
 <script>
 export default {
   data() {
+    const validator = (role) => {
+      return (rule, value, callback, source, options) => {
+        var filter = this[role].filter(item => { return item.name === value })
+        clearTimeout(this.filterTimeout[role])
+        if (filter.length === 0) {
+          this.filterTimeout[role] = setTimeout(() => {
+            callback(new Error('请输入已录入系统的名称'))
+          }, 1000)
+        } else {
+          callback()
+        }
+      }
+    }
     return {
+      client: [],
+      salesman: [],
+      technicalDirector: [],
+      filterTimeout: {
+        client: '',
+        salesman: '',
+        technicalDirector: ''
+      },
+      timeout: '',
+      getOnce: {
+        client: false,
+        salesman: false,
+        technicalDirector: false
+      },
       item: {
         name: '',
         client: '',
@@ -116,13 +159,14 @@ export default {
           { required: true, message: '请输入内容', trigger: 'blur' }
         ],
         client: [
-          { required: true, message: '请输入内容', trigger: 'blur' }
+          // { required: true, message: '请输入内容', trigger: 'change' },
+          { required: true, validator: validator('client'), trigger: 'change' }
         ],
         salesman: [
-          { required: true, message: '请输入内容', trigger: 'blur' }
+          { required: true, validator: validator('salesman'), trigger: 'change' }
         ],
         technicalDirector: [
-          { required: true, message: '请输入内容', trigger: 'blur' }
+          { required: true, validator: validator('technicalDirector'), trigger: 'change' }
         ],
         status: [
           { required: true, message: '请选择', trigger: 'change' }
@@ -148,10 +192,46 @@ export default {
       }
     }
   },
-  mounted() {
+  async mounted() {
+    const get = async(url, staffRole = '') => {
+      const res = await this.$request({
+        url: `${url}/get${staffRole}`,
+        method: 'get'
+      })
+      if (!staffRole) {
+        staffRole = url
+      }
+      this[staffRole] = res.data[staffRole]
+    }
+    get('client')
+    get('staff', 'salesman')
+    get('staff', 'technicalDirector')
     this.editItem()
   },
   methods: {
+    queryAsync(role, staffRole = '') {
+      const url = role
+      if (staffRole) {
+        role = staffRole
+      }
+      return async(queryString, cb) => {
+        if (!this.getOnce[role]) {
+          const res = await this.$request({
+            url: `${url}/get${staffRole}`,
+            method: 'get'
+          })
+          this.getOnce[role] = true
+          this[role] = res.data[role]
+        }
+        var results = queryString ? this[role].filter(this.createStateFilter(queryString)) : this[role]
+        cb(results)
+      }
+    },
+    createStateFilter(queryString) {
+      return (state) => {
+        return (state.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0)
+      }
+    },
     async handleDelete() {
       try {
         await this.$confirm('此操作将永久删除该项目信息, 是否继续?', '提示', {

@@ -1,8 +1,8 @@
 <template>
   <div class="main">
     <ceiling-operator>
-      <router-link to="/ProjectManagement/NewItem" >
-        <el-button type="primary" >新建项目</el-button>
+      <router-link to='/ProjectManagement/NewItem'>
+        <el-button type="primary" v-if="createPermission">新建项目</el-button>
       </router-link>
       <el-button type="primary" @click="queryItem">查询项目</el-button>
       <el-input v-model="queryItemData" clearable placeholder="请输入项目名称" style="width:200px;" ></el-input>
@@ -119,74 +119,23 @@
             @click="handleConfirm(scope.$index, scope.row)">
             确认
           </el-button>
-          <el-button
-            size="mini"
-            @click="handleEdit(scope.$index, scope.row)">
+          <el-button v-if="operatePermission"
+                     size="mini"
+                     @click="handleEdit(scope.$index, scope.row)">
             编辑
           </el-button>
         </template>
       </el-table-column>
     </el-table>
-    <el-dialog title="状态确认" :visible.sync="dialogFormVisible" width='400px' top='2vh'>
+    <el-dialog title="状态确认" :visible.sync="dialogFormVisible" width='360px' top='2vh' class="dialog">
       <el-form :model="singleItem">
-        <el-form-item label="报价完成" :label-width="formLabelWidth">
+        <el-form-item :label="item.label" :label-width="formLabelWidth" v-for="item in confirmData" :key="item.label" v-if="distinction(item.label)">
           <el-switch
-            v-model="singleItem.confirm.offerConfirm"
+            v-model="singleItem.confirm[item.confirm]"
             active-color="#13ce66"
             inactive-color="#ff4949">
           </el-switch>
-          <span>{{singleItem.confirm.offerConfirmDate}}</span>
-        </el-form-item>
-        <el-form-item label="合同签订" :label-width="formLabelWidth">
-          <el-switch
-            v-model="singleItem.confirm.orderConfirm"
-            active-color="#13ce66"
-            inactive-color="#ff4949">
-          </el-switch>
-          <span>{{singleItem.confirm.orderConfirmDate}}</span>
-
-        </el-form-item>
-        <el-form-item label="设计完成" :label-width="formLabelWidth">
-          <el-switch
-            v-model="singleItem.confirm.techConfirm"
-            active-color="#13ce66"
-            inactive-color="#ff4949">
-          </el-switch>
-          <span>{{singleItem.confirm.techConfirmDate}}</span>
-
-        </el-form-item>
-        <el-form-item label="采购完成" :label-width="formLabelWidth">
-          <el-switch
-            v-model="singleItem.confirm.purchasingConfirm"
-            active-color="#13ce66"
-            inactive-color="#ff4949">
-          </el-switch>
-          <span>{{singleItem.confirm.purchasingConfirmDate}}</span>
-
-        </el-form-item>
-        <el-form-item label="物料到齐" :label-width="formLabelWidth">
-          <el-switch
-            v-model="singleItem.confirm.warehouseConfirm"
-            active-color="#13ce66"
-            inactive-color="#ff4949">
-          </el-switch>
-          <span>{{singleItem.confirm.warehouseConfirmDate}}</span>
-        </el-form-item>
-        <el-form-item label="生产完成" :label-width="formLabelWidth">
-          <el-switch
-            v-model="singleItem.confirm.productConfirm"
-            active-color="#13ce66"
-            inactive-color="#ff4949">
-          </el-switch>
-          <span>{{singleItem.confirm.productConfirmDate}}</span>
-        </el-form-item>
-        <el-form-item label="送货中" :label-width="formLabelWidth">
-          <el-switch
-            v-model="singleItem.confirm.shipmentConfirm"
-            active-color="#13ce66"
-            inactive-color="#ff4949">
-          </el-switch>
-          <span>{{singleItem.confirm.shipmentConfirmDate}}</span>
+          <span>{{singleItem.confirm[item.confirmDate]}}</span>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -207,6 +156,43 @@ export default {
   },
   data() {
     return {
+      confirmData: [
+        {
+          label: '报价完成',
+          confirm: 'offerConfirm',
+          confirmDate: 'offerConfirmDate'
+        },
+        {
+          label: '合同签订',
+          confirm: 'orderConfirm',
+          confirmDate: 'orderConfirmDate'
+        },
+        {
+          label: '设计完成',
+          confirm: 'techConfirm',
+          confirmDate: 'techConfirmDate'
+        },
+        {
+          label: '采购完成',
+          confirm: 'purchasingConfirm',
+          confirmDate: 'purchasingConfirmDate'
+        },
+        {
+          label: '物料到齐',
+          confirm: 'warehouseConfirm',
+          confirmDate: 'warehouseConfirmDate'
+        },
+        {
+          label: '生产完成',
+          confirm: 'productConfirm',
+          confirmDate: 'productConfirmDate'
+        },
+        {
+          label: '送货中',
+          confirm: 'shipmentConfirm',
+          confirmDate: 'shipmentConfirmDate'
+        }
+      ],
       formLabelWidth: '100px',
       dialogFormVisible: false,
       item: [],
@@ -254,12 +240,16 @@ export default {
           warehouseConfirmDate: '',
           productConfirmDate: ''
         }
+      },
+      aaa: {
+        b: 'b'
       }
     }
   },
   mounted() {
     this.getItem()
-    // 事件监听滚动条
+    console.log(this.$store.state.user.roles.indexOf('purchase'))
+    console.log(this.$store.state.user.roles)
   },
   watch: {
     queryItemData(newVal, oldVal) {
@@ -269,6 +259,34 @@ export default {
     }
   },
   methods: {
+    distinction(label) {
+      if (this.$store.state.user.roles.indexOf('admin') >= 0) {
+        return true
+      }
+      if (this.$store.state.user.roles.indexOf('tech') >= 0) {
+        switch (label) {
+          case '报价完成':return true
+          case '设计完成':return true
+        }
+      }
+      if (this.$store.state.user.roles.indexOf('tech') >= 0) {
+        switch (label) {
+          case '报价完成':return true
+          case '设计完成':return true
+        }
+      }
+      if (this.$store.state.user.roles.indexOf('purchase') >= 0) {
+        switch (label) {
+          case '采购完成':return true
+        }
+      }
+      if (this.$store.state.user.roles.indexOf('plant') >= 0) {
+        switch (label) {
+          case '生产完成':return true
+          case '送货中':return true
+        }
+      }
+    },
     async updateConfirm() {
       const date = moment().format('YYYY-MM-DD  HH:mm:ss')
       if (this.singleItem.confirm.shipmentConfirm === true) {
@@ -283,22 +301,23 @@ export default {
       } else if (this.singleItem.confirm.offerConfirm === true) {
         this.singleItem.status = '报价完成'
       }
-      const confirmDate = function(confirm, date) {
-        const dateNow = moment().format('YYYY-MM-DD  HH:mm:ss')
+      // 加入确认时间
+      function confirmDate(confirm1, date1) {
+        const confirm = this.singleItem.confirm[confirm1]
+        const date = this.singleItem.confirm[date1]
         if (confirm === true && !date) {
-          console.log(this)
-          console.log(!date)
-          date = dateNow
-          console.log(date)
+          const dateNow = moment().format('YYYY-MM-DD  HH:mm:ss')
+          this.singleItem.confirm[date1] = dateNow
         }
       }
-      confirmDate(this.singleItem.confirm.offerConfirm, this.singleItem.confirm.offerConfirmDate)
-      confirmDate(this.singleItem.confirm.orderConfirm, this.singleItem.confirm.orderConfirmDate)
-      confirmDate(this.singleItem.confirm.techConfirm, this.singleItem.confirm.techConfirmDate)
-      confirmDate(this.singleItem.confirm.purchasingConfirm, this.singleItem.confirm.purchasingConfirmDate)
-      confirmDate(this.singleItem.confirm.warehouseConfirm, this.singleItem.confirm.warehouseConfirmDate)
-      confirmDate(this.singleItem.confirm.productConfirm, this.singleItem.confirm.productConfirmDate)
-      confirmDate(this.singleItem.confirm.shipmentConfirm, this.singleItem.confirm.shipmentConfirmDate)
+
+      confirmDate.call(this, 'offerConfirm', 'offerConfirmDate')
+      confirmDate.call(this, 'orderConfirm', 'orderConfirmDate')
+      confirmDate.call(this, 'techConfirm', 'techConfirmDate')
+      confirmDate.call(this, 'purchasingConfirm', 'purchasingConfirmDate')
+      confirmDate.call(this, 'warehouseConfirm', 'warehouseConfirmDate')
+      confirmDate.call(this, 'productConfirm', 'productConfirmDate')
+      confirmDate.call(this, 'shipmentConfirm', 'shipmentConfirmDate')
       await this.$request({
         url: 'item/update',
         method: 'post',
@@ -343,7 +362,7 @@ export default {
     },
     async queryItem() {
       const res = await this.$request({
-        url: 'item/currentQuery',
+        url: 'item/histroyQuery',
         method: 'get',
         params: {
           queryItemData: this.queryItemData
@@ -380,7 +399,18 @@ export default {
     }
   },
   computed: {
-
+    operatePermission() {
+      if (this.$store.state.user.roles.indexOf('admin') > -1) {
+        return true
+      }
+      return false
+    },
+    createPermission() {
+      if (this.$store.state.user.roles.indexOf('admin') > -1) {
+        return true
+      }
+      return false
+    }
   }
 }
 </script>
@@ -399,6 +429,9 @@ export default {
       // width: 33.333%;
       display: block;
     }
+  }
+  span {
+    margin-left: 10px;
   }
 }
 </style>

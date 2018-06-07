@@ -56,7 +56,7 @@
         <el-form-item label="职员全称" :label-width="'80px'">
           <el-input v-model="staffForm.name" ></el-input>
         </el-form-item>
-        <el-form-item label="活动区域" :label-width="'80px'">
+        <el-form-item label="职位" :label-width="'80px'">
           <el-select v-model="staffForm.jobTitle" placeholder="请选择职位">
             <el-option label="电气工程师" value="电气工程师"></el-option>
             <el-option label="业务员" value="业务员"></el-option>
