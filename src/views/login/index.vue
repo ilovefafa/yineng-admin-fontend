@@ -17,11 +17,12 @@
         <span class="show-pwd" @click="showPwd"><svg-icon icon-class="eye" /></span>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" style="width:100%;" :loading="loading" @click.native.prevent="handleLogin">
+        <el-button id='button' type="primary" style="width:100%;" :loading="loading" @click.native.prevent="handleLogin">
           登录
         </el-button>
       </el-form-item>
     </el-form>
+    <div id='test'></div>
   </div>
 </template>
 
@@ -29,6 +30,24 @@
 import { isvalidUsername } from '@/utils/validate'
 export default {
   name: 'login',
+  mounted() {
+    const Father = function() {
+      this.name = 'father'
+    }
+    Father.prototype.sayFather = function() {
+      console.log(this.name)
+    }
+    const Son = function() {
+      Father.call(this)
+      this.subName = 'son'
+    }
+    Son.prototype = new Father()
+    Son.prototype.constructor = Son
+    const instance1 = new Son()
+    instance1.sayFather()
+    console.log(Son.prototype)
+  },
+
   data() {
     const validateUsername = (rule, value, callback) => {
       if (!isvalidUsername(value)) {
@@ -57,9 +76,7 @@ export default {
       pwdType: 'password'
     }
   },
-  mounted() {
 
-  },
   methods: {
     showPwd() {
       if (this.pwdType === 'password') {
@@ -91,7 +108,16 @@ export default {
 <style rel="stylesheet/scss" lang="scss">
 $bg: #2d3a4b;
 $light_gray: #eee;
-
+.top {
+  height: 100px;
+  margin-bottom: 30px;
+  background: yellow;
+}
+.bottom {
+  height: 100px;
+  margin-top: 10px;
+  background: red;
+}
 /* reset element-ui css */
 .login-container {
   .el-input {
