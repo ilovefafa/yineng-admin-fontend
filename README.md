@@ -1,6 +1,6 @@
 # 总结
 > 该项目是为了方便公司进行项目管理而建立的后台系统 
-
+[预览](http://yinengdk.com/admin)
 [项目引用模板](https://github.com/PanJiaChen/vueAdmin-template/blob/master/README-zh.md)
 ### 功能展示
 ![](./readmeImg/01.png)
